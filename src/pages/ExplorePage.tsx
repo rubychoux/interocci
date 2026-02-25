@@ -49,7 +49,12 @@ function GalleryCard({ gallery }: { gallery: typeof MOCK_GALLERIES[0] }) {
       }}
     >
       {/* Cover image */}
-      <div className="relative h-44 overflow-hidden" style={{ background: gallery.coverImage }}>
+      <div className="relative h-44 overflow-hidden" style={{ background: '#0a0a14' }}>
+        <img
+          src={gallery.coverImage}
+          alt=""
+          className="object-cover w-full h-full absolute inset-0 opacity-80 transition-transform duration-500 group-hover:scale-105"
+        />
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{ background: 'rgba(91,63,160,0.15)' }}

@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Html } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Gallery, Artwork } from '../types';
+import { getArtTexture } from '../utils/artTextures';
 
 // ---- Movement Controller ----
 function CameraController() {
@@ -102,25 +103,6 @@ function ArtworkPanel({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  // Parse gradient to a color
-  const gradColors: Record<string, string> = {
-    'linear-gradient(135deg, #1a0535 0%, #6b21a8 50%, #0f0520 100%)': '#6b21a8',
-    'linear-gradient(135deg, #0f172a 0%, #7c3aed 30%, #be185d 100%)': '#7c3aed',
-    'linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #1e3a5f 100%)': '#4338ca',
-    'linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #0f2040 100%)': '#2563eb',
-    'linear-gradient(135deg, #0c1a2e 0%, #1e40af 40%, #7c3aed 100%)': '#1e40af',
-    'linear-gradient(135deg, #3b0764 0%, #dc2626 50%, #1c0030 100%)': '#dc2626',
-    'linear-gradient(135deg, #450a0a 0%, #991b1b 40%, #7c2d12 100%)': '#991b1b',
-    'linear-gradient(135deg, #2e1065 0%, #7c3aed 40%, #db2777 100%)': '#7c3aed',
-    'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #831843 100%)': '#4c1d95',
-    'linear-gradient(135deg, #0f0a1e 0%, #5b21b6 45%, #2563eb 100%)': '#5b21b6',
-    'linear-gradient(135deg, #052e16 0%, #16a34a 50%, #14532d 100%)': '#16a34a',
-    'linear-gradient(135deg, #1c0f00 0%, #92400e 50%, #451a03 100%)': '#92400e',
-    'linear-gradient(135deg, #1a0a00 0%, #d97706 40%, #92400e 100%)': '#d97706',
-  };
-
-  const panelColor = gradColors[artwork.imageUrl] || '#5b3fa0';
-
   useFrame(() => {
     if (meshRef.current) {
       const targetEmissive = hovered ? 0.4 : 0.1;
@@ -140,11 +122,8 @@ function ArtworkPanel({
       >
         <planeGeometry args={[2.4, 3.0]} />
         <meshStandardMaterial
-          color={panelColor}
-          emissive={panelColor}
-          emissiveIntensity={0.1}
+          map={getArtTexture(artwork.imageUrl)}
           roughness={0.4}
-          metalness={0.1}
         />
       </mesh>
 
@@ -166,28 +145,16 @@ function ArtworkPanel({
       </mesh>
 
       {/* Title label */}
-      <Text
-        position={[0, -1.85, 0.01]}
-        fontSize={0.12}
-        color="#f0eef8"
-        anchorX="center"
-        anchorY="middle"
-        font="https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5UAWdDRUEZ2RFq7AwU.woff2"
-        maxWidth={2.2}
-        textAlign="center"
-      >
-        {artwork.title}
-      </Text>
-      <Text
-        position={[0, -2.05, 0.01]}
-        fontSize={0.09}
-        color="#9b93b8"
-        anchorX="center"
-        anchorY="middle"
-        font="https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5UAWdDRUEZ2RFq7AwU.woff2"
-      >
-        {artwork.medium} · {artwork.year}
-      </Text>
+      <Html position={[0, -1.4, 0.02]} center distanceFactor={6}>
+        <div style={{ fontFamily: "'Space Mono', monospace", textAlign: 'center', pointerEvents: 'none' }}>
+          <div style={{ color: '#f0eef8', fontSize: '11px', marginBottom: '3px', maxWidth: '180px' }}>
+            {artwork.title}
+          </div>
+          <div style={{ color: '#9b93b8', fontSize: '9px' }}>
+            {artwork.medium} · {artwork.year}
+          </div>
+        </div>
+      </Html>
 
       {/* Hover tooltip */}
       {hovered && (

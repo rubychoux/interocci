@@ -24,7 +24,7 @@ function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIE
   return (
     <Link
       to={`/gallery/${gallery.id}`}
-      className="gallery-card block rounded-sm overflow-hidden"
+      className="gallery-card block rounded-sm overflow-hidden group"
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid rgba(139,92,246,0.15)',
@@ -33,9 +33,14 @@ function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIE
     >
       {/* Cover */}
       <div
-        className="h-48 relative"
-        style={{ background: gallery.coverImage }}
+        className="h-48 relative overflow-hidden"
+        style={{ background: '#0a0a14' }}
       >
+        <img
+          src={gallery.coverImage}
+          alt=""
+          className="object-cover w-full h-full absolute inset-0 opacity-80 transition-transform duration-500 group-hover:scale-105"
+        />
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(to top, rgba(18,18,26,0.8) 0%, transparent 60%)' }}
