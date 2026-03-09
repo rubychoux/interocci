@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AuthModal from './AuthModal';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [modal, setModal] = useState<'signin' | 'create' | null>(null);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -12,6 +16,7 @@ export default function Nav() {
   }, []);
 
   return (
+    <>
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
@@ -24,22 +29,8 @@ export default function Nav() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div
-            className="w-8 h-8 rounded-sm flex items-center justify-center animate-pulse-glow"
-            style={{
-              background: 'linear-gradient(135deg, #5b3fa0, #2d1f4e)',
-              border: '1px solid rgba(139,92,246,0.4)',
-            }}
-          >
-            <span className="text-xs font-display font-semibold" style={{ color: '#a78bfa' }}>IO</span>
-          </div>
-          <span
-            className="font-display text-xl tracking-widest"
-            style={{ color: 'var(--text-primary)', letterSpacing: '0.3em' }}
-          >
-            INTEROCCI
-          </span>
+        <Link to="/" className="flex items-center group">
+          <img src="/interocci-logo.png" alt="InterOcci" style={{ height: '36px', width: 'auto' }} />
         </Link>
 
         {/* Links */}
@@ -54,6 +45,15 @@ export default function Nav() {
             EXPLORE
           </Link>
           <Link
+            to="/liked"
+            className="nav-link text-xs"
+            style={{
+              color: location.pathname === '/liked' ? 'var(--purple-bright)' : 'var(--text-secondary)',
+            }}
+          >
+            ♡ LIKED
+          </Link>
+          <Link
             to="/about"
             className="nav-link text-xs"
             style={{ color: 'var(--text-secondary)' }}
@@ -64,14 +64,39 @@ export default function Nav() {
 
         {/* CTA */}
         <div className="flex items-center gap-3">
-          <button className="btn-ghost text-xs px-4 py-2 rounded-sm">
-            SIGN IN
-          </button>
-          <button className="btn-primary text-xs px-4 py-2 rounded-sm">
-            CREATE GALLERY
-          </button>
+          {user ? (
+            <>
+              <div
+                className="flex items-center justify-center rounded-full text-xs font-bold"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(139,92,246,0.2)',
+                  border: '1px solid rgba(139,92,246,0.5)',
+                  color: 'var(--purple-bright)',
+                }}
+              >
+                {user.email?.[0].toUpperCase()}
+              </div>
+              <button className="btn-ghost text-xs px-4 py-2 rounded-sm" onClick={() => signOut()}>
+                SIGN OUT
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="btn-ghost text-xs px-4 py-2 rounded-sm" onClick={() => setModal('signin')}>
+                SIGN IN
+              </button>
+              <button className="btn-primary text-xs px-4 py-2 rounded-sm" onClick={() => setModal('create')}>
+                CREATE GALLERY
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>
+
+    {modal && <AuthModal mode={modal} onClose={() => setModal(null)} />}
+    </>
   );
 }

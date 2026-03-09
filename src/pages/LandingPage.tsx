@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Suspense } from 'react';
 import HeroScene from '../components/HeroScene';
 import { MOCK_GALLERIES } from '../data/galleries';
+import { useLikes } from '../hooks/useLikes';
 
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
@@ -21,6 +22,9 @@ function StatCard({ value, label }: { value: string; label: string }) {
 }
 
 function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIES[0]; index: number }) {
+  const { isLiked, toggleLike } = useLikes();
+  const liked = isLiked(gallery.id);
+
   return (
     <Link
       to={`/gallery/${gallery.id}`}
@@ -45,8 +49,16 @@ function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIE
           className="absolute inset-0"
           style={{ background: 'linear-gradient(to top, rgba(18,18,26,0.8) 0%, transparent 60%)' }}
         />
+        {/* Heart button */}
+        <button
+          className="absolute top-3 right-3 z-10 text-base w-7 h-7 flex items-center justify-center rounded-full"
+          style={{ color: liked ? 'var(--purple-bright)' : 'rgba(255,255,255,0.45)' }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleLike(gallery.id); }}
+        >
+          {liked ? '♥' : '♡'}
+        </button>
         {gallery.featured && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute bottom-3 right-3">
             <span className="tag">FEATURED</span>
           </div>
         )}
@@ -243,38 +255,56 @@ export default function LandingPage() {
                 icon: '◈',
                 title: 'Immersive 3D Galleries',
                 desc: 'Walk through spatial exhibitions designed by artists. Every gallery is a world.',
+                imageUrl: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600&q=80',
               },
               {
                 icon: '◉',
                 title: 'AI-Generated Spaces',
                 desc: 'Transform your 2D works into dynamic 3D gallery rooms with our AI engine.',
+                imageUrl: 'https://images.unsplash.com/photo-1686191128892-3b37add4c844?w=600&q=80',
               },
               {
                 icon: '◎',
                 title: 'Global Artist Network',
                 desc: 'Connect with creators across 20+ countries. The virtual lobby never sleeps.',
+                imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
               },
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="p-6 rounded-sm"
+                className="rounded-sm overflow-hidden"
                 style={{
                   background: 'rgba(18,18,26,0.6)',
                   border: '1px solid rgba(139,92,246,0.1)',
                 }}
               >
-                <div
-                  className="font-display text-3xl mb-4 glow-text"
-                  style={{ color: 'var(--purple-bright)' }}
-                >
-                  {feature.icon}
+                {/* Card image */}
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src={feature.imageUrl}
+                    alt={feature.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(18,18,26,0.95) 100%)' }}
+                  />
                 </div>
-                <h3 className="font-display text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
-                  {feature.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  {feature.desc}
-                </p>
+                {/* Card content */}
+                <div className="p-6">
+                  <div
+                    className="font-display text-3xl mb-4 glow-text"
+                    style={{ color: 'var(--purple-bright)' }}
+                  >
+                    {feature.icon}
+                  </div>
+                  <h3 className="font-display text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {feature.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

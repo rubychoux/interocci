@@ -395,6 +395,393 @@ const generators: Record<string, () => THREE.Texture> = {
     return new THREE.CanvasTexture(c);
   },
 
+  'neon-drift': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#050010';
+    ctx.fillRect(0, 0, W, H);
+    const streaks: [number, string][] = [
+      [H * 0.15, '#ff2d9f'], [H * 0.35, '#00f5ff'], [H * 0.55, '#cc44ff'],
+      [H * 0.72, '#ff6b35'], [H * 0.88, '#00ff88'],
+    ];
+    streaks.forEach(([y, col]) => {
+      const g = ctx.createLinearGradient(0, y - 30, 0, y + 30);
+      g.addColorStop(0, 'transparent');
+      g.addColorStop(0.5, col + '88');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, y - 30, W, 60);
+    });
+    ctx.strokeStyle = 'rgba(255,45,159,0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      const x = (i / 8) * W;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + W * 0.1, H); ctx.stroke();
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'ghost-signal': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#030308';
+    ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < 5; i++) {
+      const cy = H * (0.2 + i * 0.15);
+      const alpha = 0.06 + i * 0.03;
+      ctx.strokeStyle = `rgba(180,200,255,${alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, cy);
+      for (let x = 0; x <= W; x += 3) {
+        const freq = 0.015 + i * 0.005;
+        const amp = 15 + i * 8;
+        ctx.lineTo(x, cy + Math.sin(x * freq + i) * amp);
+      }
+      ctx.stroke();
+    }
+    const g = ctx.createRadialGradient(W * 0.5, H * 0.45, 0, W * 0.5, H * 0.45, W * 0.35);
+    g.addColorStop(0, 'rgba(100,130,255,0.08)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'liminal-space': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#0a0a10';
+    ctx.fillRect(0, 0, W, H);
+    // Corridor perspective lines converging at center
+    const cx = W * 0.5, cy = H * 0.42;
+    const corridorColors = ['rgba(220,210,255,0.06)', 'rgba(220,210,255,0.04)', 'rgba(220,210,255,0.02)'];
+    for (let i = 0; i < 3; i++) {
+      const expand = (i + 1) * 0.18;
+      ctx.strokeStyle = corridorColors[i];
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - W * expand, cy - H * expand * 0.6, W * expand * 2, H * expand * 1.2);
+    }
+    // Soft center glow
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.25);
+    g.addColorStop(0, 'rgba(200,190,255,0.12)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // Floor grid lines
+    ctx.strokeStyle = 'rgba(180,180,255,0.05)';
+    ctx.lineWidth = 0.5;
+    for (let row = 0; row < 8; row++) {
+      const y = H * 0.6 + row * (H * 0.07);
+      const spread = row * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(cx - W * spread, y); ctx.lineTo(cx + W * spread, y); ctx.stroke();
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'chromatic-burst': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#08000f';
+    ctx.fillRect(0, 0, W, H);
+    const hues = [0, 30, 60, 120, 180, 240, 300];
+    hues.forEach((hue, i) => {
+      const angle = (i / hues.length) * Math.PI * 2;
+      const r = W * 0.35;
+      const x = W * 0.5 + Math.cos(angle) * r * 0.4;
+      const y = H * 0.5 + Math.sin(angle) * r * 0.4;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `hsla(${hue},100%,60%,0.5)`);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+    const core = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, 40);
+    core.addColorStop(0, 'rgba(255,255,255,0.9)');
+    core.addColorStop(1, 'transparent');
+    ctx.fillStyle = core;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'spectrum-melt': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#060410';
+    ctx.fillRect(0, 0, W, H);
+    for (let y = 0; y < H; y += 4) {
+      const t = y / H;
+      const hue = t * 360;
+      const wave = Math.sin(t * Math.PI * 3 + 1) * W * 0.08;
+      const g = ctx.createLinearGradient(wave, y, W + wave, y + 4);
+      g.addColorStop(0, `hsla(${hue},80%,40%,0.15)`);
+      g.addColorStop(0.5, `hsla(${(hue + 60) % 360},90%,55%,0.25)`);
+      g.addColorStop(1, `hsla(${(hue + 120) % 360},70%,35%,0.1)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, y, W, 4);
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'sacred-geo': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#08050f';
+    ctx.fillRect(0, 0, W, H);
+    const cx = W * 0.5, cy = H * 0.5, R = W * 0.3;
+    // Six surrounding circles (Flower of Life)
+    ctx.strokeStyle = 'rgba(212,175,55,0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R, R, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    // Outer ring
+    ctx.strokeStyle = 'rgba(212,175,55,0.15)';
+    ctx.beginPath(); ctx.arc(cx, cy, R * 2, 0, Math.PI * 2); ctx.stroke();
+    // Center glow
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.5);
+    g.addColorStop(0, 'rgba(212,175,55,0.3)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'mandala-grid': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#060810';
+    ctx.fillRect(0, 0, W, H);
+    const cx = W * 0.5, cy = H * 0.5;
+    // Concentric rings
+    for (let r = 1; r <= 6; r++) {
+      ctx.strokeStyle = `rgba(100,140,255,${0.06 + r * 0.02})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.arc(cx, cy, r * W * 0.07, 0, Math.PI * 2); ctx.stroke();
+    }
+    // Radial spokes
+    ctx.strokeStyle = 'rgba(100,140,255,0.1)';
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angle) * W * 0.45, cy + Math.sin(angle) * W * 0.45);
+      ctx.stroke();
+    }
+    // Grid overlay
+    ctx.strokeStyle = 'rgba(80,100,200,0.05)';
+    for (let gx = 0; gx < W; gx += 32) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    for (let gy = 0; gy < H; gy += 32) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'crystal-lattice': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#040810';
+    ctx.fillRect(0, 0, W, H);
+    const pts = Array.from({ length: 14 }, (_, i) => ({
+      x: W * (0.05 + 0.9 * (Math.sin(i * 3.7) * 0.5 + 0.5)),
+      y: H * (0.05 + 0.9 * (Math.cos(i * 2.3) * 0.5 + 0.5)),
+    }));
+    ctx.strokeStyle = 'rgba(150,200,255,0.15)';
+    ctx.lineWidth = 1;
+    pts.forEach((p, i) => pts.slice(i + 1, i + 5).forEach(q => {
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    }));
+    pts.forEach(p => {
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 12);
+      g.addColorStop(0, 'rgba(160,220,255,0.7)');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x - 12, p.y - 12, 24, 24);
+    });
+    return new THREE.CanvasTexture(c);
+  },
+
+  'pastoral-dawn': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+    sky.addColorStop(0, '#1a0a02');
+    sky.addColorStop(1, '#d97706');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H * 0.55);
+    // Ground
+    const ground = ctx.createLinearGradient(0, H * 0.55, 0, H);
+    ground.addColorStop(0, '#1a3a0a');
+    ground.addColorStop(1, '#0d1f06');
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    // Sunburst at horizon
+    const sun = ctx.createRadialGradient(W * 0.5, H * 0.55, 0, W * 0.5, H * 0.55, W * 0.4);
+    sun.addColorStop(0, 'rgba(253,224,71,0.5)');
+    sun.addColorStop(0.3, 'rgba(217,119,6,0.2)');
+    sun.addColorStop(1, 'transparent');
+    ctx.fillStyle = sun;
+    ctx.fillRect(0, 0, W, H);
+    // Field rows
+    ctx.strokeStyle = 'rgba(74,222,128,0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      const y = H * 0.58 + i * H * 0.05;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'green-canopy': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#030c02';
+    ctx.fillRect(0, 0, W, H);
+    // Dappled light circles
+    const spots: [number, number, number][] = [
+      [W * 0.3, H * 0.2, 60], [W * 0.65, H * 0.35, 45], [W * 0.5, H * 0.6, 80],
+      [W * 0.15, H * 0.5, 35], [W * 0.8, H * 0.7, 50], [W * 0.45, H * 0.15, 30],
+    ];
+    spots.forEach(([x, y, r]) => {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, 'rgba(134,239,172,0.12)');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+    // Branch silhouettes
+    ctx.strokeStyle = 'rgba(20,60,10,0.8)';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+      const sx = (i / 6) * W;
+      ctx.beginPath(); ctx.moveTo(sx, H); ctx.lineTo(sx + (i % 2 ? 40 : -40), 0); ctx.stroke();
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'void-arch': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#080808';
+    ctx.fillRect(0, 0, W, H);
+    // Stark rectangular forms
+    const rects: [number, number, number, number][] = [
+      [W * 0.1, H * 0.1, W * 0.8, H * 0.8],
+      [W * 0.25, H * 0.25, W * 0.5, H * 0.5],
+      [W * 0.4, H * 0.4, W * 0.2, H * 0.2],
+    ];
+    rects.forEach((r, i) => {
+      ctx.strokeStyle = `rgba(200,200,200,${0.06 + i * 0.04})`;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(...r);
+    });
+    // Single point of light in center void
+    const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.08);
+    g.addColorStop(0, 'rgba(255,255,255,0.15)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'minimal-form': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+    // Two intersecting lines
+    ctx.strokeStyle = 'rgba(220,220,220,0.2)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(W * 0.15, H * 0.5); ctx.lineTo(W * 0.85, H * 0.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W * 0.5, H * 0.15); ctx.lineTo(W * 0.5, H * 0.85); ctx.stroke();
+    // Single circle
+    ctx.strokeStyle = 'rgba(200,200,200,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(W * 0.5, H * 0.5, W * 0.2, 0, Math.PI * 2); ctx.stroke();
+    // Intersection dot
+    const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, 15);
+    g.addColorStop(0, 'rgba(255,255,255,0.35)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'sonic-wave': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#04080e';
+    ctx.fillRect(0, 0, W, H);
+    // Waveform layers
+    for (let layer = 0; layer < 4; layer++) {
+      const alpha = 0.15 + layer * 0.08;
+      const amp = 40 + layer * 20;
+      const freq = 0.012 + layer * 0.004;
+      ctx.strokeStyle = `rgba(${layer % 2 ? '100,180,255' : '140,100,255'},${alpha})`;
+      ctx.lineWidth = 1.5 - layer * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(0, H * 0.5);
+      for (let x = 0; x <= W; x += 2) {
+        ctx.lineTo(x, H * 0.5 + Math.sin(x * freq + layer * 0.8) * amp * Math.sin(x / W * Math.PI));
+      }
+      ctx.stroke();
+    }
+    return new THREE.CanvasTexture(c);
+  },
+
+  'frequency-land': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#020610';
+    ctx.fillRect(0, 0, W, H);
+    // Spectrum bars (frequency visualization)
+    const numBars = 64;
+    const barW = W / numBars;
+    for (let i = 0; i < numBars; i++) {
+      const t = i / numBars;
+      const barH = H * (0.1 + 0.5 * (Math.sin(t * Math.PI * 4) * 0.5 + 0.5) * (Math.sin(i * 0.7) * 0.5 + 0.5));
+      const hue = 200 + t * 60;
+      ctx.fillStyle = `hsla(${hue},80%,55%,0.18)`;
+      ctx.fillRect(i * barW, H - barH, barW - 1, barH);
+    }
+    // Horizon glow
+    const g = ctx.createLinearGradient(0, H * 0.6, 0, H);
+    g.addColorStop(0, 'rgba(80,120,255,0.15)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
+  'resonance': () => {
+    const [c, ctx] = make();
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#050410';
+    ctx.fillRect(0, 0, W, H);
+    // Interference rings from two sources
+    const s1 = { x: W * 0.35, y: H * 0.5 };
+    const s2 = { x: W * 0.65, y: H * 0.5 };
+    for (let r = 1; r <= 18; r++) {
+      const alpha = 0.04 + (r % 3 === 0 ? 0.04 : 0);
+      // Source 1
+      ctx.strokeStyle = `rgba(180,100,255,${alpha})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.arc(s1.x, s1.y, r * W * 0.04, 0, Math.PI * 2); ctx.stroke();
+      // Source 2
+      ctx.strokeStyle = `rgba(100,180,255,${alpha})`;
+      ctx.beginPath(); ctx.arc(s2.x, s2.y, r * W * 0.04, 0, Math.PI * 2); ctx.stroke();
+    }
+    const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.2);
+    g.addColorStop(0, 'rgba(140,60,255,0.1)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return new THREE.CanvasTexture(c);
+  },
+
   'golden-light': () => {
     const [c, ctx] = make();
     const W = c.width, H = c.height;

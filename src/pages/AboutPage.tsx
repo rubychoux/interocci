@@ -14,40 +14,53 @@ export default function AboutPage() {
     <div className="min-h-screen grid-lines" style={{ background: 'var(--bg-void)' }}>
 
       {/* Hero */}
-      <section className="pt-40 pb-24 max-w-5xl mx-auto px-6">
-        <p
-          className="text-xs tracking-widest mb-6 animate-fade-in-up"
-          style={{ color: 'var(--text-muted)', opacity: 0, animationDelay: '0.05s' }}
-        >
-          ABOUT
-        </p>
-        <h1
-          className="font-display animate-fade-in-up"
-          style={{
-            fontSize: 'clamp(3.5rem, 9vw, 7rem)',
-            lineHeight: 1.0,
-            color: 'var(--text-primary)',
-            opacity: 0,
-            animationDelay: '0.15s',
-          }}
-        >
-          About
-          <br />
-          <span className="shimmer-text">InterOcci</span>
-        </h1>
-        <p
-          className="mt-8 text-base leading-relaxed max-w-xl animate-fade-in-up"
-          style={{
-            color: 'var(--text-secondary)',
-            fontFamily: "'Space Mono', monospace",
-            fontSize: '0.875rem',
-            opacity: 0,
-            animationDelay: '0.3s',
-          }}
-        >
-          Bridging traditional art exhibitions and the digital world —
-          one immersive gallery at a time.
-        </p>
+      <section className="relative overflow-hidden pt-40 pb-24">
+        {/* Full-width background image */}
+        <img
+          src="https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1600&q=80"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ opacity: 0.3 }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, transparent 60%, var(--bg-void) 100%)' }}
+        />
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <p
+            className="text-xs tracking-widest mb-6 animate-fade-in-up"
+            style={{ color: 'var(--text-muted)', opacity: 0, animationDelay: '0.05s' }}
+          >
+            ABOUT
+          </p>
+          <h1
+            className="font-display animate-fade-in-up"
+            style={{
+              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
+              lineHeight: 1.0,
+              color: 'var(--text-primary)',
+              opacity: 0,
+              animationDelay: '0.15s',
+            }}
+          >
+            About
+            <br />
+            <span className="shimmer-text">InterOcci</span>
+          </h1>
+          <p
+            className="mt-8 text-base leading-relaxed max-w-xl animate-fade-in-up"
+            style={{
+              color: 'var(--text-secondary)',
+              fontFamily: "'Space Mono', monospace",
+              fontSize: '0.875rem',
+              opacity: 0,
+              animationDelay: '0.3s',
+            }}
+          >
+            Bridging traditional art exhibitions and the digital world —
+            one immersive gallery at a time.
+          </p>
+        </div>
       </section>
 
       {/* Mission */}
@@ -55,39 +68,51 @@ export default function AboutPage() {
         className="py-24"
         style={{ borderTop: '1px solid rgba(139,92,246,0.1)' }}
       >
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-          <div>
-            <p className="text-xs tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>
-              OUR MISSION
-            </p>
-            <h2
-              className="font-display"
-              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text-primary)', lineHeight: 1.1 }}
-            >
-              Art without walls.
-            </h2>
-          </div>
-          <div
-            className="space-y-5 text-sm leading-relaxed"
-            style={{ color: 'var(--text-secondary)', fontFamily: "'Space Mono', monospace" }}
-          >
-            <p>
-              InterOcci is a platform for visual artists to design and publish personalized
-              3D immersive exhibitions — navigable from any browser, no headset required.
-              We believe a painting deserves the same spatial presence online as it has on a
-              gallery wall.
-            </p>
-            <p>
-              The idea came from research with over 100 artists across Asia, Europe, and
-              North America. Nearly all of them described the same frustration: static image
-              grids flatten their work, strip away context, and fail to communicate the
-              scale and atmosphere that make a physical show meaningful.
-            </p>
-            <p>
-              InterOcci solves that. Artists configure a room — lighting, wall colour, artwork
-              placement — and publish a living 3D space that collectors, curators, and fans
-              can walk through in real time.
-            </p>
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-xs tracking-widest mb-10" style={{ color: 'var(--text-muted)' }}>
+            OUR MISSION
+          </p>
+          <div className="flex flex-col md:flex-row gap-12 items-start">
+            {/* Side image — ~40% width on desktop */}
+            <div className="flex-shrink-0 w-full md:w-2/5 rounded-sm overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+                alt="Art gallery interior"
+                className="w-full object-cover rounded-sm"
+                style={{ height: '320px' }}
+              />
+            </div>
+            {/* Heading + text */}
+            <div>
+              <h2
+                className="font-display mb-8"
+                style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--text-primary)', lineHeight: 1.1 }}
+              >
+                Art without walls.
+              </h2>
+              <div
+                className="space-y-5 text-sm leading-relaxed"
+                style={{ color: 'var(--text-secondary)', fontFamily: "'Space Mono', monospace" }}
+              >
+                <p>
+                  InterOcci is a platform for visual artists to design and publish personalized
+                  3D immersive exhibitions — navigable from any browser, no headset required.
+                  We believe a painting deserves the same spatial presence online as it has on a
+                  gallery wall.
+                </p>
+                <p>
+                  The idea came from research with over 100 artists across Asia, Europe, and
+                  North America. Nearly all of them described the same frustration: static image
+                  grids flatten their work, strip away context, and fail to communicate the
+                  scale and atmosphere that make a physical show meaningful.
+                </p>
+                <p>
+                  InterOcci solves that. Artists configure a room — lighting, wall colour, artwork
+                  placement — and publish a living 3D space that collectors, curators, and fans
+                  can walk through in real time.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -110,21 +135,14 @@ export default function AboutPage() {
               boxShadow: '0 0 60px rgba(91,63,160,0.06)',
             }}
           >
-            {/* Avatar */}
+            {/* Profile photo */}
             <div className="flex-shrink-0">
-              <div
-                className="flex items-center justify-center rounded-sm text-2xl font-bold"
-                style={{
-                  width: 80,
-                  height: 80,
-                  background: 'linear-gradient(135deg, #2d1f4e 0%, #5b3fa0 100%)',
-                  border: '1px solid rgba(139,92,246,0.35)',
-                  color: 'var(--purple-bright)',
-                  fontFamily: "'Space Mono', monospace",
-                }}
-              >
-                RC
-              </div>
+              <img
+                src="/profile.jpg"
+                alt="Ruby Choux Kim"
+                className="rounded-full object-cover"
+                style={{ width: '120px', height: '120px', border: '2px solid rgba(139,92,246,0.4)' }}
+              />
             </div>
 
             {/* Info */}

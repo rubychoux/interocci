@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { MOCK_GALLERIES } from '../data/galleries';
 import type { FilterState, GalleryStyle, SortOption } from '../types';
+import GalleryCard from '../components/GalleryCard';
 
 const STYLES: { value: GalleryStyle | 'all'; label: string }[] = [
   { value: 'all', label: 'ALL' },
@@ -20,119 +20,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'NEWEST' },
 ];
 
-function ArtistAvatar({ initials, size = 32 }: { initials: string; size?: number }) {
-  return (
-    <div
-      className="rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-      style={{
-        width: size,
-        height: size,
-        background: 'linear-gradient(135deg, #5b3fa0, #2d1f4e)',
-        border: '1px solid rgba(139,92,246,0.3)',
-        color: 'var(--purple-bright)',
-        fontSize: size * 0.35,
-      }}
-    >
-      {initials}
-    </div>
-  );
-}
-
-function GalleryCard({ gallery }: { gallery: typeof MOCK_GALLERIES[0] }) {
-  return (
-    <Link
-      to={`/gallery/${gallery.id}`}
-      className="gallery-card block rounded-sm overflow-hidden group"
-      style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid rgba(139,92,246,0.12)',
-      }}
-    >
-      {/* Cover image */}
-      <div className="relative h-44 overflow-hidden" style={{ background: '#0a0a14' }}>
-        <img
-          src={gallery.coverImage}
-          alt=""
-          className="object-cover w-full h-full absolute inset-0 opacity-80 transition-transform duration-500 group-hover:scale-105"
-        />
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ background: 'rgba(91,63,160,0.15)' }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(18,18,26,0.9) 0%, transparent 50%)' }}
-        />
-
-        {/* Tags */}
-        <div className="absolute top-3 left-3 flex gap-1.5 flex-wrap">
-          {gallery.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="tag">{tag.toUpperCase()}</span>
-          ))}
-        </div>
-
-        {/* Enter hint */}
-        <div
-          className="absolute bottom-3 right-3 text-xs tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ color: 'var(--purple-bright)' }}
-        >
-          ENTER GALLERY →
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="p-4">
-        {/* Artist */}
-        <div className="flex items-center gap-2.5 mb-3">
-          <ArtistAvatar initials={gallery.artist.avatar} />
-          <div className="min-w-0">
-            <p className="text-xs truncate" style={{ color: 'var(--text-primary)' }}>
-              {gallery.artist.name}
-              {gallery.artist.verified && (
-                <span className="ml-1.5" style={{ color: 'var(--purple-bright)' }}>◈</span>
-              )}
-            </p>
-            <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
-              {gallery.artist.location}
-            </p>
-          </div>
-        </div>
-
-        <h3 className="font-display text-lg mb-1.5 leading-tight" style={{ color: 'var(--text-primary)' }}>
-          {gallery.title}
-        </h3>
-        <p
-          className="text-xs leading-relaxed"
-          style={{
-            color: 'var(--text-muted)',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {gallery.description}
-        </p>
-
-        {/* Stats */}
-        <div
-          className="flex items-center gap-4 mt-3 pt-3"
-          style={{ borderTop: '1px solid rgba(139,92,246,0.08)' }}
-        >
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            {gallery.artworks.length} works
-          </span>
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            {gallery.views.toLocaleString()} views
-          </span>
-          <span className="text-xs ml-auto" style={{ color: 'var(--text-muted)' }}>
-            ♡ {gallery.likes.toLocaleString()}
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 export default function ExplorePage() {
   const [filters, setFilters] = useState<FilterState>({
