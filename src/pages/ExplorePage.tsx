@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { MOCK_GALLERIES } from '../data/galleries';
-import type { FilterState, GalleryStyle, SortOption } from '../types';
+import { useGalleries } from '../hooks/useGalleries';
+import type { GalleryWithArtist } from '../types/database';
+import type { Gallery, FilterState, GalleryStyle, SortOption } from '../types';
 import GalleryCard from '../components/GalleryCard';
 
 const STYLES: { value: GalleryStyle | 'all'; label: string }[] = [
@@ -20,16 +21,66 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'NEWEST' },
 ];
 
+function toGallery(g: GalleryWithArtist): Gallery {
+  return {
+    id: g.id,
+    title: g.title,
+    description: g.description ?? '',
+    coverImage: g.cover_image ?? '',
+    style: g.style as GalleryStyle,
+    tags: g.tags,
+    views: g.views,
+    likes: g.likes,
+    featured: g.featured,
+    createdAt: g.created_at,
+    artworks: [],
+    artist: {
+      id: g.profiles.id,
+      name: g.profiles.name ?? '',
+      handle: g.profiles.handle ?? '',
+      avatar: (g.profiles.name ?? '?')[0].toUpperCase(),
+      location: g.profiles.location ?? '',
+      followers: g.profiles.followers,
+      verified: false,
+    },
+  };
+}
+
+function SkeletonCard() {
+  return (
+    <div
+      className="rounded-sm overflow-hidden animate-pulse"
+      style={{ background: 'var(--bg-surface)', border: '1px solid rgba(139,92,246,0.12)' }}
+    >
+      <div className="h-44" style={{ background: 'rgba(139,92,246,0.07)' }} />
+      <div className="p-4 space-y-3">
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-full w-8 h-8 flex-shrink-0" style={{ background: 'rgba(139,92,246,0.1)' }} />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-2.5 rounded w-24" style={{ background: 'rgba(139,92,246,0.1)' }} />
+            <div className="h-2 rounded w-16" style={{ background: 'rgba(139,92,246,0.07)' }} />
+          </div>
+        </div>
+        <div className="h-4 rounded w-3/4" style={{ background: 'rgba(139,92,246,0.1)' }} />
+        <div className="h-2.5 rounded w-full" style={{ background: 'rgba(139,92,246,0.07)' }} />
+        <div className="h-2.5 rounded w-5/6" style={{ background: 'rgba(139,92,246,0.07)' }} />
+      </div>
+    </div>
+  );
+}
 
 export default function ExplorePage() {
+  const { galleries: rawGalleries, loading } = useGalleries();
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     style: 'all',
     sort: 'trending',
   });
 
+  const galleries = useMemo(() => rawGalleries.map(toGallery), [rawGalleries]);
+
   const filtered = useMemo(() => {
-    let result = [...MOCK_GALLERIES];
+    let result = [...galleries];
 
     if (filters.search) {
       const q = filters.search.toLowerCase();
@@ -54,7 +105,7 @@ export default function ExplorePage() {
     }
 
     return result;
-  }, [filters]);
+  }, [galleries, filters]);
 
   return (
     <div className="min-h-screen pt-20 pb-24 grid-lines" style={{ background: 'var(--bg-void)' }}>
@@ -121,27 +172,38 @@ export default function ExplorePage() {
         </div>
 
         {/* Results count */}
-        <div className="mb-6">
-          <p className="text-xs tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            {filtered.length} GALLERIES FOUND
-          </p>
-        </div>
+        {!loading && (
+          <div className="mb-6">
+            <p className="text-xs tracking-widest" style={{ color: 'var(--text-muted)' }}>
+              {filtered.length} GALLERIES FOUND
+            </p>
+          </div>
+        )}
 
         {/* Gallery grid */}
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((gallery) => (
               <GalleryCard key={gallery.id} gallery={gallery} />
             ))}
           </div>
+        ) : galleries.length === 0 ? (
+          <div className="text-center py-24">
+            <div className="font-display text-5xl mb-4" style={{ color: 'var(--text-muted)' }}>◎</div>
+            <p className="font-display text-xl mb-2" style={{ color: 'var(--text-secondary)' }}>
+              No galleries yet
+            </p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Be the first to create one!
+            </p>
+          </div>
         ) : (
           <div className="text-center py-24">
-            <div
-              className="font-display text-5xl mb-4"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              ◎
-            </div>
+            <div className="font-display text-5xl mb-4" style={{ color: 'var(--text-muted)' }}>◎</div>
             <p className="font-display text-xl mb-2" style={{ color: 'var(--text-secondary)' }}>
               No galleries found
             </p>

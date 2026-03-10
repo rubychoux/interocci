@@ -2,8 +2,35 @@
 import { Link } from 'react-router-dom';
 import { Suspense } from 'react';
 import HeroScene from '../components/HeroScene';
-import { MOCK_GALLERIES } from '../data/galleries';
+import { useGalleries } from '../hooks/useGalleries';
+import type { GalleryWithArtist } from '../types/database';
+import type { Gallery, GalleryStyle } from '../types';
 import { useLikes } from '../hooks/useLikes';
+
+function toGallery(g: GalleryWithArtist): Gallery {
+  return {
+    id: g.id,
+    title: g.title,
+    description: g.description ?? '',
+    coverImage: g.cover_image ?? '',
+    style: g.style as GalleryStyle,
+    tags: g.tags,
+    views: g.views,
+    likes: g.likes,
+    featured: g.featured,
+    createdAt: g.created_at,
+    artworks: [],
+    artist: {
+      id: g.profiles.id,
+      name: g.profiles.name ?? '',
+      handle: g.profiles.handle ?? '',
+      avatar: (g.profiles.name ?? '?')[0].toUpperCase(),
+      location: g.profiles.location ?? '',
+      followers: g.profiles.followers,
+      verified: false,
+    },
+  };
+}
 
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
@@ -21,7 +48,7 @@ function StatCard({ value, label }: { value: string; label: string }) {
   );
 }
 
-function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIES[0]; index: number }) {
+function FeaturedGalleryCard({ gallery, index }: { gallery: Gallery; index: number }) {
   const { isLiked, toggleLike } = useLikes();
   const liked = isLiked(gallery.id);
 
@@ -95,7 +122,11 @@ function FeaturedGalleryCard({ gallery, index }: { gallery: typeof MOCK_GALLERIE
 }
 
 export default function LandingPage() {
-  const featuredGalleries = MOCK_GALLERIES.filter((g) => g.featured);
+  const { galleries: rawGalleries } = useGalleries();
+  const allGalleries = rawGalleries.map(toGallery);
+  const featuredGalleries = allGalleries.filter((g) => g.featured).length > 0
+    ? allGalleries.filter((g) => g.featured)
+    : allGalleries.slice(0, 3);
 
   return (
     <div className="min-h-screen grid-lines" style={{ background: 'var(--bg-void)' }}>

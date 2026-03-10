@@ -1,8 +1,50 @@
 import { Suspense, useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
-import { MOCK_GALLERIES } from '../data/galleries';
+import { useParams, Link } from 'react-router-dom';
+import { useGallery } from '../hooks/useGalleries';
 import GalleryViewer from '../components/GalleryViewer';
 import { useLikes } from '../hooks/useLikes';
+import type { Gallery, GalleryStyle, Artwork } from '../types';
+import type { GalleryWithAll } from '../types/database';
+
+function toGallery(g: GalleryWithAll): Gallery {
+  const artist = {
+    id: g.profiles.id,
+    name: g.profiles.name ?? '',
+    handle: g.profiles.handle ?? '',
+    avatar: (g.profiles.name ?? '?')[0].toUpperCase(),
+    location: g.profiles.location ?? '',
+    followers: g.profiles.followers,
+    verified: false,
+  };
+
+  const artworks: Artwork[] = (g.artworks ?? [])
+    .slice()
+    .sort((a, b) => a.display_order - b.display_order)
+    .map((aw) => ({
+      id: aw.id,
+      title: aw.title,
+      artist,
+      imageUrl: aw.image_url ?? '',
+      medium: aw.medium ?? '',
+      year: aw.year ?? 0,
+      description: aw.description ?? '',
+    }));
+
+  return {
+    id: g.id,
+    title: g.title,
+    description: g.description ?? '',
+    coverImage: g.cover_image ?? '',
+    style: g.style as GalleryStyle,
+    tags: g.tags,
+    views: g.views,
+    likes: g.likes,
+    featured: g.featured,
+    createdAt: g.created_at,
+    artworks,
+    artist,
+  };
+}
 
 function LoadingRoom() {
   return (
@@ -25,14 +67,35 @@ function LoadingRoom() {
 
 export default function GalleryPage() {
   const { id } = useParams<{ id: string }>();
-  const gallery = MOCK_GALLERIES.find((g) => g.id === id);
-
+  const { gallery: raw, loading } = useGallery(id ?? '');
   const [immersive, setImmersive] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { isLiked, toggleLike } = useLikes();
 
-  if (!gallery) return <Navigate to="/explore" replace />;
+  if (loading) return <LoadingRoom />;
 
+  if (!raw) {
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center"
+        style={{ background: 'var(--bg-void)' }}
+      >
+        <div className="font-display text-5xl mb-4" style={{ color: 'var(--text-muted)' }}>◎</div>
+        <p className="font-display text-xl mb-4" style={{ color: 'var(--text-secondary)' }}>
+          Gallery not found
+        </p>
+        <Link
+          to="/explore"
+          className="text-xs nav-link"
+          style={{ color: 'var(--purple-bright)' }}
+        >
+          ← BACK TO EXPLORE
+        </Link>
+      </div>
+    );
+  }
+
+  const gallery = toGallery(raw);
   const liked = isLiked(gallery.id);
   const likeCount = gallery.likes + (liked ? 1 : 0);
 
