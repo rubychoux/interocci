@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 type Mode = 'signin' | 'create';
 
-export default function AuthModal({ mode, onClose }: { mode: Mode; onClose: () => void }) {
+export default function AuthModal({ mode, onClose, redirectTo }: { mode: Mode; onClose: () => void; redirectTo?: string }) {
   const [view, setView] = useState<'signin' | 'signup'>(mode === 'create' ? 'signup' : 'signin');
 
   return (
@@ -30,7 +31,7 @@ export default function AuthModal({ mode, onClose }: { mode: Mode; onClose: () =
         </button>
 
         {view === 'signin' ? (
-          <SignInView onSwitchToSignup={() => setView('signup')} onClose={onClose} />
+          <SignInView onSwitchToSignup={() => setView('signup')} onClose={onClose} redirectTo={redirectTo} />
         ) : (
           <CreateView onSwitchToSignin={() => setView('signin')} />
         )}
@@ -39,8 +40,9 @@ export default function AuthModal({ mode, onClose }: { mode: Mode; onClose: () =
   );
 }
 
-function SignInView({ onSwitchToSignup, onClose }: { onSwitchToSignup: () => void; onClose: () => void }) {
+function SignInView({ onSwitchToSignup, onClose, redirectTo }: { onSwitchToSignup: () => void; onClose: () => void; redirectTo?: string }) {
   const { signIn, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -54,6 +56,7 @@ function SignInView({ onSwitchToSignup, onClose }: { onSwitchToSignup: () => voi
     try {
       await signIn(email, password);
       onClose();
+      if (redirectTo) navigate(redirectTo);
     } catch {
       setError('Invalid email or password');
     } finally {

@@ -6,6 +6,7 @@ import GalleryPage from './pages/GalleryPage';
 import AboutPage from './pages/AboutPage';
 import LikedPage from './pages/LikedPage';
 import ArtistPage from './pages/ArtistPage';
+import CreateGalleryPage from './pages/CreateGalleryPage';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/liked" element={<Layout><LikedPage /></Layout>} />
         <Route path="/artist/:id" element={<Layout><ArtistPage /></Layout>} />
+        <Route path="/create" element={<Layout><CreateGalleryPage /></Layout>} />
       </Routes>
     </BrowserRouter>
   );

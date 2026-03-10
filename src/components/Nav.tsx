@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [modal, setModal] = useState<'signin' | 'create' | null>(null);
+  const [modal, setModal] = useState<'signin' | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -14,6 +15,14 @@ export default function Nav() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const handleCreateGallery = () => {
+    if (user) {
+      navigate('/create');
+    } else {
+      setModal('signin');
+    }
+  };
 
   return (
     <>
@@ -78,6 +87,9 @@ export default function Nav() {
               >
                 {user.email?.[0].toUpperCase()}
               </div>
+              <button className="btn-primary text-xs px-4 py-2 rounded-sm" onClick={handleCreateGallery}>
+                CREATE GALLERY
+              </button>
               <button className="btn-ghost text-xs px-4 py-2 rounded-sm" onClick={() => signOut()}>
                 SIGN OUT
               </button>
@@ -87,7 +99,7 @@ export default function Nav() {
               <button className="btn-ghost text-xs px-4 py-2 rounded-sm" onClick={() => setModal('signin')}>
                 SIGN IN
               </button>
-              <button className="btn-primary text-xs px-4 py-2 rounded-sm" onClick={() => setModal('create')}>
+              <button className="btn-primary text-xs px-4 py-2 rounded-sm" onClick={handleCreateGallery}>
                 CREATE GALLERY
               </button>
             </>
@@ -96,7 +108,7 @@ export default function Nav() {
       </div>
     </nav>
 
-    {modal && <AuthModal mode={modal} onClose={() => setModal(null)} />}
+    {modal && <AuthModal mode="signin" onClose={() => setModal(null)} redirectTo="/create" />}
     </>
   );
 }
